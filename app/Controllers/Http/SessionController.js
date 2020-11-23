@@ -45,7 +45,7 @@ class SessionController {
 
   async me ({ auth, response }) {
 
-    const user = auth.getUser()
+    const user = await auth.getUser()
 
     return response.json({
       status: 'success',
@@ -57,7 +57,7 @@ class SessionController {
 
     try {
       // get currently authenticated user
-    const user = auth.getUser()
+    const user = await auth.getUser()
 
       // update with new data entered
       const data = request.only(['name', 'phone'])
