@@ -49,7 +49,7 @@ class SessionController {
 
     return response.json({
       status: 'success',
-      data: user
+      data: user.toJSON()
     })
   }
 
