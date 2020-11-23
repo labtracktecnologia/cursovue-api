@@ -51,7 +51,7 @@ class SessionController {
       status: 'success',
       data: user,
       extras: {
-        origin: request.originalUrl(),
+        origin: `${request.protocol()}://${request.hostname()}${request.originalUrl()}`,
         url: request.url()
       }
     })
