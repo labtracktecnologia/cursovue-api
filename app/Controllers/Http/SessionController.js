@@ -45,7 +45,7 @@ class SessionController {
 
   async me ({ auth, response }) {
 
-    const user = auth.current.user
+    const user = auth.getUser()
 
     return response.json({
       status: 'success',
@@ -57,7 +57,7 @@ class SessionController {
 
     try {
       // get currently authenticated user
-      const user = auth.current.user
+    const user = auth.getUser()
 
       // update with new data entered
       const data = request.only(['name', 'phone'])
@@ -79,24 +79,27 @@ class SessionController {
 
   async changePassword({ auth, request, response }) {
 
-    const { password, newPassword } = request.all()
-    const user = auth.current.user
-
-    const verifyPassword = await Hash.verify(password, user.password)
-
-    if (!verifyPassword) {
+    const { password, newPassword, repeatPassword } = request.all()
+    const user = await auth.getUser()
+    try {
+      await auth.attempt(user.email, password)
+      if (newPassword !== repeatPassword) {
+        return response.status(400).json({
+          status: 'error',
+          message: 'Nova senha e repetição não são identicas!'
+        })
+      }
+      await user.merge({ password: newPassword })
+      return response.json({
+        status: 'success',
+        message: 'Senha atualizada!'
+      })
+    } catch (error) {
       return response.status(400).json({
         status: 'error',
         message: 'Senha atual não confere!'
       })
     }
-
-    user.password = await Hash.make(newPassword)
-    await user.save()
-    return response.json({
-      status: 'success',
-      message: 'Senha atualizada!'
-    })
   }
 }
 
