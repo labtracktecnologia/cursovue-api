@@ -50,10 +50,10 @@ class SessionController {
     return response.json({
       status: 'success',
       data: user,
-      extras: {
-        origin: `${request.protocol()}://${request.hostname()}${request.originalUrl()}`,
-        url: request.url()
-      }
+      // extras: {
+      //   origin: `${request.protocol()}://${request.hostname()}${request.originalUrl()}`,
+      //   url: request.url()
+      // }
     })
   }
 
