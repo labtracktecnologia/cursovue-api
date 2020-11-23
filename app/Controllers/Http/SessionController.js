@@ -43,13 +43,17 @@ class SessionController {
     }
   }
 
-  async me ({ auth, response }) {
+  async me ({ auth, response, request }) {
 
     const user = await auth.getUser()
 
     return response.json({
       status: 'success',
-      data: user
+      data: user,
+      extras: {
+        origin: request.originalUrl(),
+        url: request.url()
+      }
     })
   }
 
