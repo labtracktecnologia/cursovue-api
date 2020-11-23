@@ -22,6 +22,9 @@ Route.get('/', () => {
 
 Route.post('/login', 'SessionController.login')
 Route.post('/register', 'SessionController.register')
+Route.get('/@me', 'SessionController.me')
+Route.put('/@me', 'SessionController.updateProfile')
+Route.put('/@me/password', 'SessionController.changePassword')
 
 Route.resource('customers', 'CustomerController').middleware(['auth:jwt'])
 Route.resource('products', 'ProductController').middleware(['auth:jwt'])
