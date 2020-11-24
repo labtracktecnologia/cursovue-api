@@ -30,7 +30,7 @@ class User extends Model {
   }
 
   getUrl ({ image }) {
-    return image ? `/users/images/${image}` : null
+    return image ? `${image}` : null
   }
 
   /**

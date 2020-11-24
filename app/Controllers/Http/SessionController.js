@@ -122,9 +122,9 @@ class SessionController {
         height: 200,
         fit: sharp.fit.cover
       })
-      .toBuffer()
+      .toFile(`/tmp/${fileName}`)
 
-    const url = await Drive.disk('minio').put(buffer, fileName, type)
+    const url = await Drive.disk('minio').put(`/tmp/${fileName}`, fileName, type)
 
     if (image.error().type) {
       return response.status(400).send({
@@ -133,6 +133,7 @@ class SessionController {
         message: image.error().message || 'Erro no upload da imagem'
       })
     }
+
 
     user.image = url
     await user.save()
