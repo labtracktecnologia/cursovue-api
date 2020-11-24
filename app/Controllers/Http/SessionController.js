@@ -2,6 +2,7 @@
 
 const sharp = require('sharp');
 
+const Drive = use('Drive')
 const Helpers = use('Helpers')
 const User = use('App/Models/User')
 
@@ -52,11 +53,7 @@ class SessionController {
 
     return response.json({
       status: 'success',
-      data: user,
-      // extras: {
-      //   origin: `${request.protocol()}://${request.hostname()}${request.originalUrl()}`,
-      //   url: request.url()
-      // }
+      data: user
     })
   }
 
@@ -117,14 +114,17 @@ class SessionController {
     })
 
     const fileName = `${user.id}-${Date.now()}.${image.subtype}`;
+    const type = `${image.type}/${image.subtype}`
 
-    await sharp(image.tmpPath)
+    const buffer = await sharp(image.tmpPath)
       .resize({
         width: 200,
         height: 200,
         fit: sharp.fit.cover
       })
-      .toFile(Helpers.tmpPath(`uploads/users/${fileName}`))
+      .toBuffer()
+
+    const url = await Drive.disk('minio').put(buffer, fileName, type)
 
     if (image.error().type) {
       return response.status(400).send({
@@ -134,7 +134,7 @@ class SessionController {
       })
     }
 
-    user.image = fileName
+    user.image = url
     await user.save()
     return {
       status: 'success',
