@@ -1,5 +1,8 @@
 'use strict'
 
+const sharp = require('sharp');
+
+const Helpers = use('Helpers')
 const User = use('App/Models/User')
 
 class SessionController {
@@ -82,7 +85,6 @@ class SessionController {
   }
 
   async changePassword({ auth, request, response }) {
-
     const { password, newPassword, repeatPassword } = request.all()
     const user = await auth.getUser()
     try {
@@ -103,6 +105,41 @@ class SessionController {
         status: 'error',
         message: 'Senha atual não confere!'
       })
+    }
+  }
+
+  async imageUpload({ auth, request, response }) {
+    const user = await auth.getUser()
+
+    const image = request.file('image', {
+      types: ['image'],
+      size: '2mb'
+    })
+
+    const fileName = `${user.id}-${Date.now()}.${image.subtype}`;
+
+    await sharp(image.tmpPath)
+      .resize({
+        width: 200,
+        height: 200,
+        fit: sharp.fit.cover
+      })
+      .toFile(Helpers.tmpPath(`uploads/users/${fileName}`))
+
+    if (image.error().type) {
+      return response.status(400).send({
+        status: 'error',
+        data: image.error(),
+        message: image.error().message || 'Erro no upload da imagem'
+      })
+    }
+
+    user.image = fileName
+    await user.save()
+    return {
+      status: 'success',
+      message: 'Upload realizado com sucesso!',
+      data: user
     }
   }
 }
