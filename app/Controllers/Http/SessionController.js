@@ -47,7 +47,7 @@ class SessionController {
     }
   }
 
-  async me ({ auth, response, request }) {
+  async me ({ auth, response }) {
 
     const user = await auth.getUser()
 
@@ -92,7 +92,8 @@ class SessionController {
           message: 'Nova senha e repetição não são identicas!'
         })
       }
-      await user.merge({ password: newPassword })
+      user.merge({ password: newPassword })
+      await user.save()
       return response.json({
         status: 'success',
         message: 'Senha atualizada!'
@@ -103,6 +104,12 @@ class SessionController {
         message: 'Senha atual não confere!'
       })
     }
+  }
+
+  async imageRemove({ auth }) {
+    const user = await auth.getUser()
+    user.merge({ image: null })
+    await user.save()
   }
 
   async imageUpload({ auth, request, response }) {
